@@ -16,36 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `tblaccesscontrol`
---
-
-DROP TABLE IF EXISTS `tblaccesscontrol`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tblaccesscontrol` (
-  `accessControlId` varchar(10) NOT NULL,
-  `accessControlUserId` varchar(10) NOT NULL,
-  `accessControlSettingId` varchar(10) NOT NULL,
-  `accessControlAccessLevel` enum('view','edit','delete') NOT NULL,
-  PRIMARY KEY (`accessControlId`),
-  UNIQUE KEY `accessControlId_UNIQUE` (`accessControlId`),
-  UNIQUE KEY `accessControlUserId_UNIQUE` (`accessControlUserId`),
-  UNIQUE KEY `accessControlSettingId_UNIQUE` (`accessControlSettingId`),
-  CONSTRAINT `tblaccesscontrol_ibfk_1` FOREIGN KEY (`accessControlUserId`) REFERENCES `tbluser` (`userId`),
-  CONSTRAINT `tblaccesscontrol_ibfk_2` FOREIGN KEY (`accessControlSettingId`) REFERENCES `tblsetting` (`settingId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tblaccesscontrol`
---
-
-LOCK TABLES `tblaccesscontrol` WRITE;
-/*!40000 ALTER TABLE `tblaccesscontrol` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tblaccesscontrol` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `tblnotification`
 --
 
@@ -57,9 +27,9 @@ CREATE TABLE `tblnotification` (
   `notifSessionId` varchar(10) NOT NULL,
   `notifTime` datetime NOT NULL,
   `notifType` varchar(50) NOT NULL,
+  `notifNameDescription` mediumtext NOT NULL,
   PRIMARY KEY (`notifId`),
-  UNIQUE KEY `notifId_UNIQUE` (`notifId`),
-  UNIQUE KEY `notifSessionId_UNIQUE` (`notifSessionId`),
+  KEY `tblnotification_ibfk_1` (`notifSessionId`),
   CONSTRAINT `tblnotification_ibfk_1` FOREIGN KEY (`notifSessionId`) REFERENCES `tblsession` (`sessionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -70,6 +40,7 @@ CREATE TABLE `tblnotification` (
 
 LOCK TABLES `tblnotification` WRITE;
 /*!40000 ALTER TABLE `tblnotification` DISABLE KEYS */;
+INSERT INTO `tblnotification` VALUES ('0001','123456789','2024-06-06 12:16:00','Student Login','Kim Carlo Larino has started his session'),('0002','123456789','2024-06-06 14:16:00','Student Logout','Kim Carlo Larino has ended his session');
 /*!40000 ALTER TABLE `tblnotification` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -87,8 +58,7 @@ CREATE TABLE `tblprocess` (
   `processStartTime` datetime NOT NULL,
   `processEndTime` datetime NOT NULL,
   PRIMARY KEY (`processId`),
-  UNIQUE KEY `processId_UNIQUE` (`processId`),
-  UNIQUE KEY `processSessionId_UNIQUE` (`processSessionId`),
+  KEY `tblprocess_ibfk_1` (`processSessionId`),
   CONSTRAINT `tblprocess_ibfk_1` FOREIGN KEY (`processSessionId`) REFERENCES `tblsession` (`sessionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -112,12 +82,13 @@ DROP TABLE IF EXISTS `tblsession`;
 CREATE TABLE `tblsession` (
   `sessionId` varchar(10) NOT NULL,
   `sessionUserId` varchar(10) NOT NULL,
-  `sessionStartTime` datetime NOT NULL,
-  `sessionEndTime` datetime NOT NULL,
-  `sessionDuration` int NOT NULL,
+  `sessionStartTime` datetime DEFAULT NULL,
+  `sessionEndTime` datetime DEFAULT NULL,
+  `sessionDuration` varchar(10) DEFAULT NULL,
+  `sessionStatus` varchar(20) NOT NULL,
   PRIMARY KEY (`sessionId`),
   UNIQUE KEY `sessionId_UNIQUE` (`sessionId`),
-  UNIQUE KEY `sessionUserId_UNIQUE` (`sessionUserId`),
+  KEY `tblsession_ibfk_1` (`sessionUserId`),
   CONSTRAINT `tblsession_ibfk_1` FOREIGN KEY (`sessionUserId`) REFERENCES `tbluser` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -128,7 +99,7 @@ CREATE TABLE `tblsession` (
 
 LOCK TABLES `tblsession` WRITE;
 /*!40000 ALTER TABLE `tblsession` DISABLE KEYS */;
-INSERT INTO `tblsession` VALUES ('123456789','2021-10589','2024-06-06 15:16:00','2024-06-06 17:16:00',120);
+INSERT INTO `tblsession` VALUES ('123456789','2021-10589','2024-06-05 15:16:00','2024-06-05 17:16:00','02:00:00','Finished'),('987654321','2021-10589','2024-06-06 12:16:00','2024-06-06 12:16:00','','On-Going');
 /*!40000 ALTER TABLE `tblsession` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -140,13 +111,12 @@ DROP TABLE IF EXISTS `tblsetting`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tblsetting` (
-  `settingId` varchar(10) NOT NULL,
+  `settingSessionId` varchar(10) NOT NULL,
   `settingName` varchar(255) NOT NULL,
   `settingType` enum('Feature','Program','Website') NOT NULL,
-  `settingWhitelistBlacklist` enum('Whitelist','Blacklist') DEFAULT NULL,
-  `settingBlockNotification` enum('Block','Notification') DEFAULT NULL,
-  PRIMARY KEY (`settingId`),
-  UNIQUE KEY `settingId_UNIQUE` (`settingId`)
+  `settingWhitelistBlacklist` enum('Whitelist','Blacklist') NOT NULL,
+  `settingBlockNotification` enum('Block','Notification') NOT NULL,
+  PRIMARY KEY (`settingSessionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -172,8 +142,6 @@ CREATE TABLE `tbluser` (
   `userPassword` varchar(64) NOT NULL,
   `userRole` varchar(20) NOT NULL,
   PRIMARY KEY (`userId`),
-  UNIQUE KEY `userId_UNIQUE` (`userId`),
-  UNIQUE KEY `userEmail_UNIQUE` (`userEmail`),
   CONSTRAINT `tbluser_chk_1` CHECK ((`userRole` in (_utf8mb4'Student',_utf8mb4'Professor',_utf8mb4'Employee',_utf8mb4'Leader',_utf8mb4'Admin')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -184,7 +152,7 @@ CREATE TABLE `tbluser` (
 
 LOCK TABLES `tbluser` WRITE;
 /*!40000 ALTER TABLE `tbluser` DISABLE KEYS */;
-INSERT INTO `tbluser` VALUES ('2003-10001','janalbert.julian@lpulaguna.edu.ph','1234','professor'),('2021-10091','christophergalano@lpulaguna.edu.ph','1234','student'),('2021-10589','kimcarlolarino@lpulaguna.edu.ph','1234','student'),('2021-10674','reymondcalinog@lpulaguna.edu.ph','1234','student');
+INSERT INTO `tbluser` VALUES ('2003-10001','janalbert.julian@lpulaguna.edu.ph','1234','Professor'),('2021-10091','christophergalano@lpulaguna.edu.ph','1234','Student'),('2021-10589','kimcarlolarino@lpulaguna.edu.ph','1234','Student'),('2021-10674','reymondcalinog@lpulaguna.edu.ph','1234','Student');
 /*!40000 ALTER TABLE `tbluser` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -197,4 +165,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-06 15:18:56
+-- Dump completed on 2024-06-06 16:49:57
