@@ -23,13 +23,14 @@ DROP TABLE IF EXISTS `tblaccesscontrol`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tblaccesscontrol` (
-  `accessControlId` int NOT NULL,
-  `accessControlUserId` int DEFAULT NULL,
-  `accessControlSettingId` int DEFAULT NULL,
-  `accessControlAccessLevel` enum('view','edit','delete') DEFAULT NULL,
+  `accessControlId` varchar(10) NOT NULL,
+  `accessControlUserId` varchar(10) NOT NULL,
+  `accessControlSettingId` varchar(10) NOT NULL,
+  `accessControlAccessLevel` enum('view','edit','delete') NOT NULL,
   PRIMARY KEY (`accessControlId`),
-  KEY `accessControlUserId` (`accessControlUserId`),
-  KEY `accessControlSettingId` (`accessControlSettingId`),
+  UNIQUE KEY `accessControlId_UNIQUE` (`accessControlId`),
+  UNIQUE KEY `accessControlUserId_UNIQUE` (`accessControlUserId`),
+  UNIQUE KEY `accessControlSettingId_UNIQUE` (`accessControlSettingId`),
   CONSTRAINT `tblaccesscontrol_ibfk_1` FOREIGN KEY (`accessControlUserId`) REFERENCES `tbluser` (`userId`),
   CONSTRAINT `tblaccesscontrol_ibfk_2` FOREIGN KEY (`accessControlSettingId`) REFERENCES `tblsetting` (`settingId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -52,12 +53,13 @@ DROP TABLE IF EXISTS `tblnotification`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tblnotification` (
-  `notifId` int NOT NULL,
-  `notifSessionId` int DEFAULT NULL,
-  `notifTime` datetime DEFAULT NULL,
-  `notifType` varchar(50) DEFAULT NULL,
+  `notifId` varchar(10) NOT NULL,
+  `notifSessionId` varchar(10) NOT NULL,
+  `notifTime` datetime NOT NULL,
+  `notifType` varchar(50) NOT NULL,
   PRIMARY KEY (`notifId`),
-  KEY `notifSessionId` (`notifSessionId`),
+  UNIQUE KEY `notifId_UNIQUE` (`notifId`),
+  UNIQUE KEY `notifSessionId_UNIQUE` (`notifSessionId`),
   CONSTRAINT `tblnotification_ibfk_1` FOREIGN KEY (`notifSessionId`) REFERENCES `tblsession` (`sessionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -79,13 +81,14 @@ DROP TABLE IF EXISTS `tblprocess`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tblprocess` (
-  `processId` int NOT NULL,
-  `processSessionId` int DEFAULT NULL,
-  `processName` varchar(255) DEFAULT NULL,
-  `processStartTime` datetime DEFAULT NULL,
-  `processEndTime` datetime DEFAULT NULL,
+  `processId` varchar(10) NOT NULL,
+  `processSessionId` varchar(10) NOT NULL,
+  `processName` varchar(255) NOT NULL,
+  `processStartTime` datetime NOT NULL,
+  `processEndTime` datetime NOT NULL,
   PRIMARY KEY (`processId`),
-  KEY `processSessionId` (`processSessionId`),
+  UNIQUE KEY `processId_UNIQUE` (`processId`),
+  UNIQUE KEY `processSessionId_UNIQUE` (`processSessionId`),
   CONSTRAINT `tblprocess_ibfk_1` FOREIGN KEY (`processSessionId`) REFERENCES `tblsession` (`sessionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -107,13 +110,14 @@ DROP TABLE IF EXISTS `tblsession`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tblsession` (
-  `sessionId` int NOT NULL,
-  `sessionUserId` int DEFAULT NULL,
-  `sessionStartTime` datetime DEFAULT NULL,
-  `sessionEndTime` datetime DEFAULT NULL,
-  `sessionDuration` int DEFAULT NULL,
+  `sessionId` varchar(10) NOT NULL,
+  `sessionUserId` varchar(10) NOT NULL,
+  `sessionStartTime` datetime NOT NULL,
+  `sessionEndTime` datetime NOT NULL,
+  `sessionDuration` int NOT NULL,
   PRIMARY KEY (`sessionId`),
-  KEY `sessionUserId` (`sessionUserId`),
+  UNIQUE KEY `sessionId_UNIQUE` (`sessionId`),
+  UNIQUE KEY `sessionUserId_UNIQUE` (`sessionUserId`),
   CONSTRAINT `tblsession_ibfk_1` FOREIGN KEY (`sessionUserId`) REFERENCES `tbluser` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -124,6 +128,7 @@ CREATE TABLE `tblsession` (
 
 LOCK TABLES `tblsession` WRITE;
 /*!40000 ALTER TABLE `tblsession` DISABLE KEYS */;
+INSERT INTO `tblsession` VALUES ('123456789','2021-10589','2024-06-06 15:16:00','2024-06-06 17:16:00',120);
 /*!40000 ALTER TABLE `tblsession` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -135,12 +140,13 @@ DROP TABLE IF EXISTS `tblsetting`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tblsetting` (
-  `settingId` int NOT NULL,
-  `settingName` varchar(255) DEFAULT NULL,
-  `settingType` enum('feature','program','website') DEFAULT NULL,
-  `settingWhitelistBlacklist` enum('whitelist','blacklist') DEFAULT NULL,
-  `settingBlockNotification` enum('block','notification') DEFAULT NULL,
-  PRIMARY KEY (`settingId`)
+  `settingId` varchar(10) NOT NULL,
+  `settingName` varchar(255) NOT NULL,
+  `settingType` enum('Feature','Program','Website') NOT NULL,
+  `settingWhitelistBlacklist` enum('Whitelist','Blacklist') DEFAULT NULL,
+  `settingBlockNotification` enum('Block','Notification') DEFAULT NULL,
+  PRIMARY KEY (`settingId`),
+  UNIQUE KEY `settingId_UNIQUE` (`settingId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -161,12 +167,14 @@ DROP TABLE IF EXISTS `tbluser`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tbluser` (
-  `userId` int NOT NULL,
-  `userEmail` varchar(64) DEFAULT NULL,
-  `userPassword` varchar(64) DEFAULT NULL,
-  `userRole` varchar(20) DEFAULT NULL,
+  `userId` varchar(10) NOT NULL,
+  `userEmail` varchar(64) NOT NULL,
+  `userPassword` varchar(64) NOT NULL,
+  `userRole` varchar(20) NOT NULL,
   PRIMARY KEY (`userId`),
-  CONSTRAINT `tbluser_chk_1` CHECK ((`userRole` in (_utf8mb4'student',_utf8mb4'professor')))
+  UNIQUE KEY `userId_UNIQUE` (`userId`),
+  UNIQUE KEY `userEmail_UNIQUE` (`userEmail`),
+  CONSTRAINT `tbluser_chk_1` CHECK ((`userRole` in (_utf8mb4'Student',_utf8mb4'Professor',_utf8mb4'Employee',_utf8mb4'Leader',_utf8mb4'Admin')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -176,6 +184,7 @@ CREATE TABLE `tbluser` (
 
 LOCK TABLES `tbluser` WRITE;
 /*!40000 ALTER TABLE `tbluser` DISABLE KEYS */;
+INSERT INTO `tbluser` VALUES ('2003-10001','janalbert.julian@lpulaguna.edu.ph','1234','professor'),('2021-10091','christophergalano@lpulaguna.edu.ph','1234','student'),('2021-10589','kimcarlolarino@lpulaguna.edu.ph','1234','student'),('2021-10674','reymondcalinog@lpulaguna.edu.ph','1234','student');
 /*!40000 ALTER TABLE `tbluser` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -188,4 +197,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-06 14:00:40
+-- Dump completed on 2024-06-06 15:18:56
